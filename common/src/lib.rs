@@ -4,22 +4,28 @@ use std::io::{BufRead, BufReader};
 use std::ops::Not;
 use std::str::FromStr;
 
-pub fn read_all_lines(day: &str) -> impl Iterator<Item = String> {
-	BufReader::new(File::open(format!("input/day{}.txt", day)).unwrap())
-		.lines()
-		.map(|l| l.unwrap())
+pub fn read_all_lines() -> impl Iterator<Item = String> {
+	BufReader::new(
+		File::open(format!(
+			"input/{}.txt",
+			std::env::var("CARGO_PKG_NAME").unwrap()
+		))
+		.unwrap(),
+	)
+	.lines()
+	.map(|l| l.unwrap())
 }
 
-pub fn read_lines(day: &str) -> impl Iterator<Item = String> {
-	read_all_lines(day).filter(|l| !l.is_empty())
+pub fn read_lines() -> impl Iterator<Item = String> {
+	read_all_lines().filter(|l| !l.is_empty())
 }
 
-pub fn try_read_lines_as<T: FromStr>(day: &str) -> impl Iterator<Item = Result<T, String>> {
-	read_lines(day).map(|l| T::from_str(&l).map_err(|_| l))
+pub fn try_read_lines_as<T: FromStr>() -> impl Iterator<Item = Result<T, String>> {
+	read_lines().map(|l| T::from_str(&l).map_err(|_| l))
 }
 
-pub fn read_lines_as<T: FromStr>(day: &str) -> impl Iterator<Item = T> {
-	try_read_lines_as(day).map(|l| l.unwrap())
+pub fn read_lines_as<T: FromStr>() -> impl Iterator<Item = T> {
+	try_read_lines_as().map(|l| l.unwrap())
 }
 
 pub trait Add<Rhs = Self> {
