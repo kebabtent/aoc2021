@@ -1,5 +1,4 @@
-use common::{read_lines_as, DoubletSum};
-use itertools::Itertools;
+use common::{read_lines_as, DoubletSum, IterExt};
 
 fn main() {
 	let (a, b) = read_lines_as::<u32>()

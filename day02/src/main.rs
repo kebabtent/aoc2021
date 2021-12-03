@@ -2,7 +2,7 @@ use common::{read_lines, IterExt};
 
 fn main() {
 	let (x, y, z) = read_lines().fold((0, 0, 0), |(x, y, z), l| {
-		let (c, v) = l.split(" ").next_doublet().unwrap();
+		let (c, v) = l.split(" ").next_tuple().unwrap();
 		let v = v.parse::<u32>().unwrap();
 		match c {
 			"forward" => (x + v, y, z + y * v),
