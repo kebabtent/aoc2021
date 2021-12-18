@@ -54,8 +54,8 @@ fn main() {
 		})
 		.unwrap();
 
-	println!("{:#?}", a);
-	println!("{:#?}", b);
+	println!("{}", a);
+	println!("{}", b);
 }
 
 fn u(s: &[Vec<u8>]) -> u32 {
