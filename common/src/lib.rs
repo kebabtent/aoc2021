@@ -91,7 +91,8 @@ pub trait IterExt: Iterator + Sized {
 		F: FnMut(&mut S, Self::Item) -> Option<B>,
 	{
 		while let Some(item) = self.next() {
-			if let v @ Some(_) = f(&mut state, item) {
+			let v = f(&mut state, item);
+			if v.is_some() {
 				return v;
 			}
 		}
