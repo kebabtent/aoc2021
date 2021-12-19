@@ -6,4 +6,3 @@ edition = "2021"
 
 [dependencies]
 common = { path = "../common" }
-retain_mut = "0.1"
