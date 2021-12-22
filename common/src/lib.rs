@@ -10,15 +10,7 @@ mod bitmap;
 mod tuple;
 
 pub fn read_all_lines() -> impl Iterator<Item = String> {
-	BufReader::new(
-		File::open(format!(
-			"input/{}.txt",
-			std::env::var("CARGO_PKG_NAME").unwrap()
-		))
-		.unwrap(),
-	)
-	.lines()
-	.filter_map(|l| l.ok())
+	reader().lines().filter_map(|l| l.ok())
 }
 
 pub fn read_lines() -> impl Iterator<Item = String> {
@@ -31,6 +23,32 @@ pub fn try_read_lines_as<T: FromStr>() -> impl Iterator<Item = Result<T, String>
 
 pub fn read_lines_as<T: FromStr>() -> impl Iterator<Item = T> {
 	try_read_lines_as().filter_map(|l| l.ok())
+}
+
+fn reader() -> BufReader<File> {
+	BufReader::new(
+		File::open(format!(
+			"input/{}.txt",
+			std::env::var("CARGO_PKG_NAME").unwrap()
+		))
+		.unwrap(),
+	)
+}
+
+pub fn read_values_as<T: FromStr>(delimiter: char) -> impl Iterator<Item = T> {
+	read_values_raw(delimiter).filter_map(|v| std::str::from_utf8(&v).ok()?.parse().ok())
+}
+
+pub fn read_values(delimiter: char) -> impl Iterator<Item = String> {
+	read_values_raw(delimiter).filter_map(|v| String::from_utf8(v).ok())
+}
+
+fn read_values_raw(delimiter: char) -> impl Iterator<Item = Vec<u8>> {
+	let it = ReadUntil {
+		reader: reader(),
+		delimiter: delimiter as u8,
+	};
+	it.filter_map(|v| v.ok())
 }
 
 pub trait Add<Rhs = Self> {
@@ -175,5 +193,28 @@ impl<T> Buffer<T> {
 		};
 		self.inner.push_back(value);
 		res
+	}
+}
+
+pub struct ReadUntil<R> {
+	reader: R,
+	delimiter: u8,
+}
+
+impl<R: BufRead> Iterator for ReadUntil<R> {
+	type Item = std::io::Result<Vec<u8>>;
+
+	fn next(&mut self) -> Option<Self::Item> {
+		let mut buf = Vec::with_capacity(4);
+		match self.reader.read_until(self.delimiter, &mut buf) {
+			Ok(0) => None,
+			Ok(_) => {
+				if buf.ends_with(&[self.delimiter]) {
+					buf.pop();
+				}
+				Some(Ok(buf))
+			}
+			Err(e) => Some(Err(e)),
+		}
 	}
 }
